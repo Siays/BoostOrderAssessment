@@ -74,7 +74,7 @@
                 <!-- Cart Icon with Badge -->
                 <Grid Grid.Column="1" Margin="15,0">
                     <!-- Cart Button -->
-                    <Button Background="Transparent" BorderThickness="0" Width="30" Height="30">
+                    <Button Background="Transparent" BorderThickness="0" Width="30" Height="30" x:Name="CartButton" Click="CartButton_Click">
                         <TextBlock Text="🛒" FontSize="18" Foreground="Black"/>
                     </Button>
 
@@ -127,8 +127,8 @@
                                         <ColumnDefinition Width="70"/>
                                     </Grid.ColumnDefinitions>
 
-                  
-                                   
+
+
                                     <!-- LEFT SIDE - PRODUCT INFO -->
                                     <StackPanel Grid.Column="0" 
             VerticalAlignment="Top" 
@@ -223,12 +223,12 @@
                                                CornerRadius="8,0,0,8"
                                                Width="36" Height="36">
                                             <Button Background="Transparent"
-            BorderThickness="0"
-            FontSize="18"
-            FontWeight="Bold"
-            Foreground="#666"
-            Content="−"
-            Command="{Binding DecreaseCommand}"/>
+                                                BorderThickness="0"
+                                                FontSize="18"
+                                                FontWeight="Bold"
+                                                Foreground="#666"
+                                                Content="−"
+                                                Command="{Binding DecreaseCommand}"/>
                                         </Border>
 
                                         <!-- Quantity Input -->
@@ -237,13 +237,13 @@
                                                BorderThickness="0,1,0,1"
                                                Width="40" Height="36">
                                             <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-             Background="Transparent"
-             BorderThickness="0"
-             TextAlignment="Center"
-             VerticalContentAlignment="Center"
-             FontSize="14"
-             FontWeight="SemiBold"/>
-                                        </Border>
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 TextAlignment="Center"
+                                                 VerticalContentAlignment="Center"
+                                                 FontSize="14"
+                                                 FontWeight="SemiBold"/>
+                                                                            </Border>
 
                                         <!-- Plus Button -->
                                         <Border Background="#F8F8F8" 
@@ -252,12 +252,12 @@
                                                CornerRadius="0,8,8,0"
                                                Width="36" Height="36">
                                             <Button Background="Transparent"
-            BorderThickness="0"
-            FontSize="18"
-            FontWeight="Bold"
-            Foreground="#666"
-            Content="+"
-            Command="{Binding IncreaseCommand}"/>
+                                                BorderThickness="0"
+                                                FontSize="18"
+                                                FontWeight="Bold"
+                                                Foreground="#666"
+                                                Content="+"
+                                                Command="{Binding IncreaseCommand}"/>
                                         </Border>
 
                                         <!-- Plus Circle Icon -->
@@ -270,7 +270,9 @@
                                                    FontSize="18" 
                                                    FontWeight="Bold"
                                                    Foreground="White"
-                                                   Content="+"/>
+                                                   Content="+" 
+                                                    Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"/>
                                         </Border>
                                     </StackPanel>
                                 </Grid>

@@ -142,8 +142,7 @@ namespace BoostOrderAssessment.ViewModels
                 var variations = db.Variations.Where(v => v.ProductEntityId == dbProduct.Id).ToList();
                 var firstVariation = variations.FirstOrDefault();
 
-                if (firstVariation == null || firstVariation.StockQuantity <= 0)
-                    continue; // ⬅ Skip products with no stock
+                if (firstVariation == null) continue;
 
                 var displayModel = new ProductDisplayModel
                 {
@@ -152,7 +151,6 @@ namespace BoostOrderAssessment.ViewModels
                     ImageUrl = string.IsNullOrEmpty(dbProduct.ImageUrl)
                         ? "/Assets/img_placeholder.png"
                         : dbProduct.ImageUrl,
-                    
                     FirstSku = firstVariation.Sku ?? $"SKU_{dbProduct.Id}",
                     PriceDisplay = FormatPrice(firstVariation.RegularPrice),
                     Units = variations
@@ -165,14 +163,19 @@ namespace BoostOrderAssessment.ViewModels
                 displayModel.SetStockQuantity(firstVariation.StockQuantity);
 
                 if (!displayModel.Units.Any())
+                {
                     displayModel.Units.Add("UNIT");
+                }
 
-                _allProducts.Add(displayModel);
+                // Only add if in stock
+                if (displayModel.InStock)
+                {
+                    _allProducts.Add(displayModel);
+                }
             }
 
             FilterProducts();
         }
-
 
         private string FormatPrice(decimal price) =>
             price > 0 ? $"RM{price:F2}" : "RM0.00";

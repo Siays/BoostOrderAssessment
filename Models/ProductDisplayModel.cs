@@ -1,10 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Input;
 using BoostOrderAssessment.ViewModels;
-using System;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-
 
 namespace BoostOrderAssessment.Models
 {
@@ -76,6 +74,8 @@ namespace BoostOrderAssessment.Models
         {
             _stockQuantity = stockQty;
             UpdateStockDisplay();
+            OnPropertyChanged(nameof(InStock));
+            OnPropertyChanged(nameof(CanIncrease));
         }
 
         private void UpdateStockDisplay()

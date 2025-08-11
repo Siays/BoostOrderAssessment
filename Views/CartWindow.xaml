@@ -1,0 +1,50 @@
+﻿<Window x:Class="BoostOrderAssessment.Views.CartWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Cart" Height="600" Width="450" WindowStartupLocation="CenterScreen">
+
+    <DockPanel>
+        <!-- HEADER with Clear Cart -->
+        <StackPanel Orientation="Horizontal" Background="#00AEEF" DockPanel.Dock="Top" Height="50">
+            <TextBlock Text="Cart" FontSize="18" Foreground="White" 
+                       VerticalAlignment="Center" Margin="10,0"/>
+            <Button Content="Clear Cart" Command="{Binding ClearCartCommand}" 
+                    HorizontalAlignment="Right"/>
+        </StackPanel>
+
+        <!-- CART ITEMS -->
+        <ListView ItemsSource="{Binding CartItems}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left side -->
+                        <StackPanel>
+                            <TextBlock Text="{Binding ProductName}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding UnitPrice, StringFormat=RM{0:F2}}"/>
+                            <TextBlock Text="Qty: {Binding Quantity}"/>
+                        </StackPanel>
+
+                        <!-- Right side -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding LineTotal, StringFormat=RM{0:F2}}" Margin="0,0,10,0"/>
+                            <Button Content="🗑" Command="{Binding DataContext.RemoveFromCartCommand, 
+                                             RelativeSource={RelativeSource AncestorType=Window}}" 
+                                    CommandParameter="{Binding}"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- FOOTER SUMMARY -->
+        <StackPanel DockPanel.Dock="Bottom" Background="#F0F0F0">
+            <TextBlock Text="{Binding SummaryText}" FontWeight="Bold"/>
+            <TextBlock Text="{Binding CartTotal, StringFormat=Total: RM{0:F2}}" FontSize="16"/>
+        </StackPanel>
+    </DockPanel>
+</Window>
