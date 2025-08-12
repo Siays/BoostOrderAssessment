@@ -67,7 +67,7 @@ public class CartViewModel : INotifyPropertyChanged
                 UnitPrice = product.Price,
                 Quantity = quantityToAdd,
                 ImageUrl = product.ImageUrl,
-                Sku = product.FirstSku,
+                Sku = product.Sku,
                 Product = product
             });
         }
