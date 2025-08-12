@@ -16,6 +16,7 @@ namespace BoostOrderAssessment.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        // Removed unused CartViewModel reference (was never used)
         private ObservableCollection<ProductDisplayModel> _products = new();
         private ObservableCollection<ProductDisplayModel> _allProducts = new();
         private string _searchText;
@@ -46,13 +47,12 @@ namespace BoostOrderAssessment.ViewModels
 
         private void FilterProducts()
         {
-            Products.Clear();
             var filtered = string.IsNullOrWhiteSpace(_searchText)
                 ? _allProducts
                 : new ObservableCollection<ProductDisplayModel>(
                     _allProducts.Where(p => p.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase)));
 
-            foreach (var p in filtered) Products.Add(p);
+            Products = new ObservableCollection<ProductDisplayModel>(filtered);
         }
 
         public async Task LoadProductsAsync()
@@ -60,15 +60,18 @@ namespace BoostOrderAssessment.ViewModels
             using var db = new AppDbContext();
             db.Database.EnsureCreated();
 
-            // Try fetching from API first
-            var apiProducts = await ApiService.GetVariableProductsAsync();
-
-            if (apiProducts?.Any() == true)
+            try
             {
-                await SaveProductsToDatabase(apiProducts);
+                var apiProducts = await ApiService.GetVariableProductsAsync();
+
+                if (apiProducts?.Any() == true)
+                    await SaveProductsToDatabase(apiProducts);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"API fetch failed: {ex.Message}");
             }
 
-            // Always load from DB
             LoadFromDatabase();
         }
 
@@ -92,25 +95,16 @@ namespace BoostOrderAssessment.ViewModels
                     DateModified = parsedDate
                 };
 
-                if (p.Variations != null && p.Variations.Any())
+                if (p.Variations != null)
                 {
                     foreach (var v in p.Variations)
                     {
                         decimal.TryParse(v.RegularPrice, out decimal parsedPrice);
 
-                        int stockQty = 0;
-                        if (v.Inventory != null && v.Inventory.Any())
-                        {
-                            stockQty = v.Inventory.Sum(i => i.StockQuantity);
-                        }
-                        else if (v.StockQuantity.HasValue)
-                        {
-                            stockQty = v.StockQuantity.Value;
-                        }
-                        else if (p.StockQuantity.HasValue)
-                        {
-                            stockQty = p.StockQuantity.Value;
-                        }
+                        int stockQty = v.Inventory?.Sum(i => i.StockQuantity)
+                                      ?? v.StockQuantity
+                                      ?? p.StockQuantity
+                                      ?? 0;
 
                         productEntity.Variations.Add(new VariationEntity
                         {
@@ -141,7 +135,6 @@ namespace BoostOrderAssessment.ViewModels
             {
                 var variations = db.Variations.Where(v => v.ProductEntityId == dbProduct.Id).ToList();
                 var firstVariation = variations.FirstOrDefault();
-
                 if (firstVariation == null) continue;
 
                 var displayModel = new ProductDisplayModel
@@ -152,6 +145,7 @@ namespace BoostOrderAssessment.ViewModels
                         ? "/Assets/img_placeholder.png"
                         : dbProduct.ImageUrl,
                     FirstSku = firstVariation.Sku ?? $"SKU_{dbProduct.Id}",
+                    Price = firstVariation.RegularPrice,
                     PriceDisplay = FormatPrice(firstVariation.RegularPrice),
                     Units = variations
                         .Where(v => !string.IsNullOrEmpty(v.Uom))
@@ -163,15 +157,10 @@ namespace BoostOrderAssessment.ViewModels
                 displayModel.SetStockQuantity(firstVariation.StockQuantity);
 
                 if (!displayModel.Units.Any())
-                {
                     displayModel.Units.Add("UNIT");
-                }
 
-                // Only add if in stock
                 if (displayModel.InStock)
-                {
                     _allProducts.Add(displayModel);
-                }
             }
 
             FilterProducts();
@@ -180,7 +169,7 @@ namespace BoostOrderAssessment.ViewModels
         private string FormatPrice(decimal price) =>
             price > 0 ? $"RM{price:F2}" : "RM0.00";
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

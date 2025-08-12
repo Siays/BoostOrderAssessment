@@ -18,6 +18,7 @@ namespace BoostOrderAssessment.Models
         public bool InStock => _stockQuantity > 0;
         public string FirstSku { get; set; } = "";
         public string PriceDisplay { get; set; } = "";
+        public decimal Price { get; set; }
         public List<string> Units { get; set; } = new();
 
         public string StockDisplay

@@ -16,17 +16,38 @@
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-        <Grid Grid.Row="0" Background="#00AEEF">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <Border Background="#00AEEF" Grid.Row="0" Height="50" Padding="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="40"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="15,0">
-                <TextBlock Text="Categories Name" FontSize="14" FontWeight="Bold" Foreground="White"/>
-                <TextBlock Text="Company Name" FontSize="12" Foreground="White" Opacity="0.8"/>
-            </StackPanel>
-        </Grid>
+                <!-- Back Arrow -->
+                <Button Grid.Column="0" Width="40" Height="50" Background="Transparent" BorderThickness="0" Padding="0">
+                    <TextBlock Text="&#x2039;" FontSize="20" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Button>
+
+                <!-- Title -->
+                <TextBlock Grid.Column="1" Text="Categories Name" FontSize="18" Foreground="White" VerticalAlignment="Center"/>
+
+                <!-- Company Name -->
+                <TextBlock Grid.Column="2" Text="Company Name" FontSize="14" Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0"/>
+
+                <!-- Company Initials Circle -->
+                <Border Grid.Column="3" Width="32" Height="32" CornerRadius="16" Background="White" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,10,0">
+                    <TextBlock Text="CN" Foreground="#00AEEF" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Border>
+
+                <!-- Menu (three dots) -->
+                <Button Grid.Column="4" Width="40" Height="50" Background="Transparent" BorderThickness="0" Padding="0">
+                    <TextBlock Text="&#x22EE;" FontSize="18" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Button>
+            </Grid>
+        </Border>
 
         <!-- SEARCH BAR -->
         <Border Grid.Row="1" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,1">
@@ -44,7 +65,7 @@
                  Padding="40,0,15,0" FontSize="14"
                  VerticalContentAlignment="Center"
                  Foreground="#333"
-                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                 Text="{Binding ProductViewModel.SearchText, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <!-- Search Icon (always visible) -->
                         <TextBlock Text="🔍" FontSize="14" Foreground="#999" 
@@ -79,30 +100,12 @@
                     </Button>
 
                     <!-- Badge (circle + count) -->
-                    <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-5,-5,0">
+                    <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-5,-5,0"
+                        Visibility="{Binding CartViewModel.BadgeVisibility}">
                         <Ellipse Width="20" Height="20" Fill="Red"/>
-                        <TextBlock Text="{Binding CartCount}" 
+                        <TextBlock Text="{Binding CartViewModel.CartCount}" 
                    FontSize="10" FontWeight="Bold" Foreground="White" 
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CartCount}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding CartCount}" Value="">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding CartCount}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding CartCount}" Value="1">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
                     </Grid>
                 </Grid>
             </Grid>
@@ -110,7 +113,7 @@
 
         <!-- PRODUCT LIST -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Background="White">
-            <ItemsControl ItemsSource="{Binding Products}" Margin="0">
+            <ItemsControl ItemsSource="{Binding ProductViewModel.Products}" Margin="0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border Background="White" BorderBrush="#E8E8E8" BorderThickness="0,0,0,1" Padding="16,16">
@@ -128,12 +131,11 @@
                                     </Grid.ColumnDefinitions>
 
 
-
                                     <!-- LEFT SIDE - PRODUCT INFO -->
                                     <StackPanel Grid.Column="0" 
-            VerticalAlignment="Top" 
-            HorizontalAlignment="Left"
-            Width="250">
+                                        VerticalAlignment="Top" 
+                                        HorizontalAlignment="Left"
+                                        Width="250">
 
 
                                         <!-- SKU and Stock (same line) -->
@@ -265,14 +267,15 @@
                                                Width="36" Height="36" 
                                                CornerRadius="18"
                                                Margin="8,0,0,0">
-                                            <Button Background="Transparent" 
-                                                   BorderThickness="0"
-                                                   FontSize="18" 
-                                                   FontWeight="Bold"
-                                                   Foreground="White"
-                                                   Content="+" 
-                                                    Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}"/>
+                                            <Button
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                FontSize="18"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                Content="+"
+                                                Command="{Binding Path=DataContext.CartViewModel.AddToCartCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                CommandParameter="{Binding}" />
                                         </Border>
                                     </StackPanel>
                                 </Grid>

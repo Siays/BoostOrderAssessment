@@ -15,24 +15,27 @@ using BoostOrderAssessment.ViewModels;
 
 namespace BoostOrderAssessment.Views
 {
-    /// <summary>
-    /// Interaction logic for CartWindow.xaml
-    /// </summary>
     public partial class CartWindow : Window
-    {
-        private CartViewModel cartViewModel = new CartViewModel();
-
+    {      
         public CartWindow(CartViewModel viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;
         }
 
-        private void CartButton_Click(object sender, RoutedEventArgs e)
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            var cartWindow = new CartWindow(cartViewModel);
-            cartWindow.Owner = this;
-            cartWindow.ShowDialog();
+            this.Close();
+        }
+
+        private void MenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.ContextMenu != null)
+            {
+                button.ContextMenu.PlacementTarget = button;
+                button.ContextMenu.IsOpen = true;
+            }
         }
     }
 }

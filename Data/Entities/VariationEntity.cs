@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BoostOrderAssessment.Data.Entities
+﻿namespace BoostOrderAssessment.Data.Entities
 {
     public class VariationEntity
     {

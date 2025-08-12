@@ -9,13 +9,11 @@ using System.Windows;
 using System.Windows.Controls;
 using static BoostOrderAssessment.Views.CartWindow;
 
-
 namespace BoostOrderAssessment.Views
 {
     public partial class MainWindow : Window
     {
-        private ProductViewModel viewModel = new ProductViewModel();
-        private CartViewModel cartViewModel = new CartViewModel();
+        private MainViewModel viewModel = new MainViewModel();
 
         public MainWindow()
         {
@@ -25,12 +23,12 @@ namespace BoostOrderAssessment.Views
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await viewModel.LoadProductsAsync();
+            await viewModel.ProductViewModel.LoadProductsAsync();
         }
 
         private void CartButton_Click(object sender, RoutedEventArgs e)
         {
-            var cartWindow = new CartWindow(cartViewModel); // Pass the viewModel here
+            var cartWindow = new CartWindow(viewModel.CartViewModel);
             cartWindow.Owner = this;
             cartWindow.ShowDialog();
         }
