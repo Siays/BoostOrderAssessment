@@ -8,7 +8,7 @@ namespace BoostOrderAssessment.Models
 {
     public class ProductDisplayModel : INotifyPropertyChanged
     {
-        private int _quantity = 1;
+        private int _quantity = 0;
         private int _stockQuantity;
         private string _stockDisplay = "";
 
@@ -20,6 +20,22 @@ namespace BoostOrderAssessment.Models
         public string PriceDisplay { get; set; } = "";
         public decimal Price { get; set; }
         public List<string> Units { get; set; } = new();
+        public Dictionary<string, string> UnitSkus { get; set; } = new();
+
+
+        private string _sku = "";
+        public string Sku
+        {
+            get => _sku;
+            private set
+            {
+                if (_sku != value)
+                {
+                    _sku = value;
+                    OnPropertyChanged(nameof(Sku));
+                }
+            }
+        }
 
         public string StockDisplay
         {
@@ -36,7 +52,7 @@ namespace BoostOrderAssessment.Models
             get => _quantity;
             set
             {
-                if (value < 1) value = 1;
+                if (value < 1) value = 0;
                 if (value > _stockQuantity) value = _stockQuantity;
 
                 _quantity = value;
@@ -48,7 +64,7 @@ namespace BoostOrderAssessment.Models
         }
 
         public bool CanIncrease => Quantity < _stockQuantity;
-        public bool CanDecrease => Quantity > 1;
+        public bool CanDecrease => Quantity > 0;
 
         public ICommand IncreaseCommand { get; }
         public ICommand DecreaseCommand { get; }
@@ -67,7 +83,7 @@ namespace BoostOrderAssessment.Models
 
         public void Decrease()
         {
-            if (Quantity > 1)
+            if (Quantity > 0)
                 Quantity--;
         }
 
@@ -89,5 +105,48 @@ namespace BoostOrderAssessment.Models
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private string _selectedUnit;
+        public Dictionary<string, decimal> UnitPrices { get; set; } = new();
+
+        public string SelectedUnit
+        {
+            get => _selectedUnit;
+            set
+            {
+                if (_selectedUnit != value)
+                {
+                    _selectedUnit = value;
+
+                    if (UnitPrices.TryGetValue(value, out var newPrice))
+                    {
+                        Price = newPrice;
+                        PriceDisplay = $"RM{newPrice:F2}";
+                        OnPropertyChanged(nameof(Price));
+                        OnPropertyChanged(nameof(PriceDisplay));
+                    }
+
+                    if (UnitSkus.TryGetValue(value, out var newSku))
+                    {
+                        UpdateSku(newSku);
+                    }
+                    else
+                    {
+                        UpdateSku(FirstSku);
+                    }
+
+                    OnPropertyChanged(nameof(SelectedUnit));
+                }
+            }
+        }
+
+        public void UpdateSku(string newSku)
+        {
+            if (_sku != newSku)
+            {
+                _sku = newSku;
+                OnPropertyChanged(nameof(Sku));
+            }
+        }
     }
 }

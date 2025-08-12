@@ -16,7 +16,6 @@ namespace BoostOrderAssessment.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        // Removed unused CartViewModel reference (was never used)
         private ObservableCollection<ProductDisplayModel> _products = new();
         private ObservableCollection<ProductDisplayModel> _allProducts = new();
         private string _searchText;
@@ -133,7 +132,10 @@ namespace BoostOrderAssessment.ViewModels
 
             foreach (var dbProduct in dbProducts)
             {
-                var variations = db.Variations.Where(v => v.ProductEntityId == dbProduct.Id).ToList();
+                var variations = db.Variations
+                    .Where(v => v.ProductEntityId == dbProduct.Id)
+                    .ToList();
+
                 var firstVariation = variations.FirstOrDefault();
                 if (firstVariation == null) continue;
 
@@ -154,10 +156,32 @@ namespace BoostOrderAssessment.ViewModels
                         .ToList()
                 };
 
-                displayModel.SetStockQuantity(firstVariation.StockQuantity);
+                displayModel.UnitPrices = variations
+                    .Where(v => !string.IsNullOrEmpty(v.Uom))
+                    .ToDictionary(v => v.Uom.ToUpper(), v => v.RegularPrice);
+
+                displayModel.UnitSkus = variations
+                    .Where(v => !string.IsNullOrEmpty(v.Uom))
+                    .ToDictionary(v => v.Uom.ToUpper(), v => v.Sku ?? "");
 
                 if (!displayModel.Units.Any())
+                {
                     displayModel.Units.Add("UNIT");
+                    displayModel.UnitPrices["UNIT"] = firstVariation.RegularPrice;
+                }
+
+                // Set initial unit & stock
+                displayModel.SelectedUnit = displayModel.Units.First();
+                displayModel.SetStockQuantity(firstVariation.StockQuantity);
+
+                if (displayModel.UnitSkus.TryGetValue(displayModel.SelectedUnit, out var sku))
+                {
+                    displayModel.UpdateSku(sku);
+                }
+                else
+                {
+                    displayModel.UpdateSku(displayModel.FirstSku);
+                }
 
                 if (displayModel.InStock)
                     _allProducts.Add(displayModel);

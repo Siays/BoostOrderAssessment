@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
-
+using MaterialDesignThemes.Wpf;
 public class CartViewModel : INotifyPropertyChanged
 {
     public ObservableCollection<CartItemModel> CartItems { get; } = new();
@@ -12,7 +12,7 @@ public class CartViewModel : INotifyPropertyChanged
     public ICommand RemoveFromCartCommand { get; }
     public ICommand ClearCartCommand { get; }
     public ICommand AddToCartCommand { get; }
-
+    public SnackbarMessageQueue SnackbarMessageQueue { get; set; }
     public decimal CartTotal => CartItems.Sum(i => i.LineTotal);
     public int ItemCount => CartItems.Count;
     public string SummaryText => $"Total ({ItemCount})";
@@ -73,6 +73,7 @@ public class CartViewModel : INotifyPropertyChanged
         }
 
         NotifyTotalsChanged();
+        SnackbarMessageQueue?.Enqueue($"{quantityToAdd} {product.Name} added to cart.");
     }
 
     private void NotifyTotalsChanged()

@@ -19,6 +19,7 @@ namespace BoostOrderAssessment.Views
         {
             InitializeComponent();
             DataContext = viewModel;
+
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
